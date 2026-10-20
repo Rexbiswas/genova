@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <defs>
+    <linearGradient id="medinova-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0786C5" />
+      <stop offset="100%" stop-color="#09B7D5" />
+    </linearGradient>
+  </defs>
+  <rect width="40" height="40" rx="12" fill="url(#medinova-grad)" />
+  <path d="M20 30s-8-5.333-8-11.333a5.333 5.333 0 0 1 9.333-3.467 5.333 5.333 0 0 1 9.333 3.467C30.667 24.667 20 30 20 30z" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M15 19h3l2-4 3 8 2-4h3" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
