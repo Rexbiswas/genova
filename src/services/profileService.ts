@@ -2,16 +2,22 @@ import { UserProfile } from '../types/user';
 import { initialUserProfile } from '../data/demoData';
 import { apiFetch, IS_DEMO_MODE } from './apiClient';
 
-const STORAGE_KEY = 'medinova_profile';
+const STORAGE_KEY = 'genova_profile';
+const LEGACY_STORAGE_KEY = 'genova_profile';
 
 function getStoredProfile(): UserProfile {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialUserProfile));
       return initialUserProfile;
     }
-    return JSON.parse(raw);
+    const parsed: UserProfile = JSON.parse(raw);
+    if (parsed.email && parsed.email.includes('@medinova.')) {
+      parsed.email = parsed.email.replace('@medinova.', '@genova.');
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch {
     return initialUserProfile;
   }

@@ -46,8 +46,8 @@ export const DoctorDetailsPage: React.FC = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${doctor.name} - MediNova`,
-          text: `Book an appointment with ${doctor.name}, ${doctor.specialty} on MediNova Healthcare OS.`,
+          title: `${doctor.name} - Genova`,
+          text: `Book an appointment with ${doctor.name}, ${doctor.specialty} on Genova Healthcare OS.`,
           url: window.location.href,
         });
       } catch {

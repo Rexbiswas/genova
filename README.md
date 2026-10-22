@@ -1,6 +1,6 @@
-# MediNova Healthcare OS
+# Genova Healthcare OS
 
-**MediNova Healthcare OS** is a NextGen patient and clinical coordination dashboard built with **React, TypeScript, Vite, Tailwind CSS, GSAP, Lenis, and React Router DOM**.
+**Genova Healthcare OS** is a NextGen patient and clinical coordination dashboard built with **React, TypeScript, Vite, Tailwind CSS, GSAP, Lenis, and React Router DOM**.
 
 Better Care. Smarter Connections.
 
@@ -15,7 +15,7 @@ Better Care. Smarter Connections.
 - **Patient Profile Management**: Form validation using **React Hook Form** and **Zod** for patient demographics, contact details, language, and blood group.
 - **Activity & Notification Center**: Mark as read, mark all read, unread badge counter, and category filtering.
 - **Searchable Help & FAQ**: Filterable clinical FAQs accordion and medical coordination desk ticket submission form.
-- **MediNova Pro Subscription**: Interactive Pro upgrade modal featuring AI diagnostics and priority teleconsults.
+- **Genova Pro Subscription**: Interactive Pro upgrade modal featuring AI diagnostics and priority teleconsults.
 - **Full-Stack Ready Architecture**: Clean separation between UI and the typed services layer (`apiClient.ts`, `doctorService.ts`, `appointmentService.ts`, etc.) ready for seamless Node.js/Express/MongoDB integration.
 - **GSAP & Lenis Smooth Motion**: Integrated GSAP 3 animation engine, `@gsap/react`, ScrollTrigger, and Lenis smooth scrolling with ticker synchronization and reduced-motion accessibility.
 

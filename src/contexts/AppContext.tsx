@@ -248,7 +248,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updated = await profileService.upgradeToPro();
     setProfile(updated);
     closeProModal();
-    showToast('🎉 Welcome to MediNova Pro! 30-day trial activated.');
+    showToast('🎉 Welcome to Genova Pro! 30-day trial activated.');
   }, [closeProModal, showToast]);
 
   const unreadCount = notifications.filter(n => !n.read).length;

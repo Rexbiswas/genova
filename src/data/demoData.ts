@@ -202,7 +202,7 @@ export const initialAppointments: Appointment[] = [
 export const initialUserProfile: UserProfile = {
   id: 'usr-1',
   name: 'Stevan Dux',
-  email: 'stevan@medinova.health',
+  email: 'stevan@genova.health',
   phone: '(+351) 912 345 678',
   location: 'Braga, Portugal',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&q=80',
@@ -234,7 +234,7 @@ export const initialNotifications: NotificationItem[] = [
   },
   {
     id: 'notif-3',
-    title: 'MediNova AI Assistant Update',
+    title: 'Genova AI Assistant Update',
     message: 'Automated triage is now available on all active video consultation rooms.',
     type: 'telehealth',
     timestamp: '1 day ago',
@@ -249,7 +249,7 @@ export const faqData = [
   },
   {
     question: 'How does the online video consultation room work?',
-    answer: 'When your appointment starts, a "Join Video Room" button unlocks right on your appointment card. Clicking it launches an encrypted, HIPAA-compliant HD video interface directly within MediNova without needing any external software.',
+    answer: 'When your appointment starts, a "Join Video Room" button unlocks right on your appointment card. Clicking it launches an encrypted, HIPAA-compliant HD video interface directly within Genova without needing any external software.',
   },
   {
     question: 'Can I reschedule or cancel an existing appointment?',
@@ -257,10 +257,10 @@ export const faqData = [
   },
   {
     question: 'Is my health data and medical record private?',
-    answer: 'All patient records, consultation summaries, vitals, and appointments in MediNova OS are end-to-end encrypted following strict international healthcare privacy regulations (HIPAA, GDPR, and ISO 27799 compliant).',
+    answer: 'All patient records, consultation summaries, vitals, and appointments in Genova OS are end-to-end encrypted following strict international healthcare privacy regulations (HIPAA, GDPR, and ISO 27799 compliant).',
   },
   {
-    question: 'What benefits are included in MediNova Pro?',
-    answer: 'MediNova Pro provides 24/7 priority teleconsultations with zero wait times, AI-assisted automated triage of uploaded lab reports, multi-specialist care coordination, and complimentary family member coverage.',
+    question: 'What benefits are included in Genova Pro?',
+    answer: 'Genova Pro provides 24/7 priority teleconsultations with zero wait times, AI-assisted automated triage of uploaded lab reports, multi-specialist care coordination, and complimentary family member coverage.',
   },
 ];

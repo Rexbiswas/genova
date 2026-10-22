@@ -17,6 +17,8 @@ export const profileFormSchema = z.object({
   location: z.string().min(2, 'Please enter your city/location'),
   preferredLanguage: z.string().default('en'),
   bloodGroup: z.string().optional(),
+  dob: z.string().optional(),
+  emergencyContact: z.string().optional(),
 });
 
 export type ProfileFormData = z.infer<typeof profileFormSchema>;

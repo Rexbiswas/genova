@@ -57,7 +57,7 @@ export const HelpPage: React.FC = () => {
     },
     {
       q: 'Is online consultation safe?',
-      a: 'Yes, 100%. All MediNova video and audio consultations are end-to-end encrypted and fully HIPAA-compliant. Only you and your certified doctor have access to the session.',
+      a: 'Yes, 100%. All Genova video and audio consultations are end-to-end encrypted and fully HIPAA-compliant. Only you and your certified doctor have access to the session.',
     },
     {
       q: 'How do I update my profile?',

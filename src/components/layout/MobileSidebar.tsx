@@ -80,7 +80,7 @@ export const MobileSidebar: React.FC = () => {
     >
       <div
         ref={drawerRef}
-        className="w-[280px] h-full bg-white flex flex-col shadow-2xl overflow-y-auto"
+        className="w-[280px] h-full bg-white flex flex-col shadow-2xl overflow-y-auto no-scrollbar"
         data-lenis-prevent
       >
         {/* Brand & Close (Screen 10) */}
@@ -90,7 +90,7 @@ export const MobileSidebar: React.FC = () => {
               ✚
             </div>
             <div>
-              <span className="text-base font-black text-ink tracking-tight block leading-tight">MediNova</span>
+              <span className="text-base font-black text-ink tracking-tight block leading-tight">Genova</span>
               <span className="text-[8px] font-black text-primary tracking-widest uppercase block leading-none">HEALTHCARE OS</span>
             </div>
           </div>
@@ -150,7 +150,7 @@ export const MobileSidebar: React.FC = () => {
         {/* Pro Card (Screen 10) */}
         <div className="p-4 mt-auto border-t border-border-light">
           <div className="rounded-2xl bg-[#092846] p-4 text-white shadow-lg space-y-2">
-            <h4 className="text-sm font-black text-white">MediNova Pro</h4>
+            <h4 className="text-sm font-black text-white">Genova Pro</h4>
             <p className="text-xs text-slate-300 leading-snug">
               Get unlimited consultations & AI health insights.
             </p>

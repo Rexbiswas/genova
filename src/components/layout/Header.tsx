@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
             <span className="text-base font-black">✚</span>
           </div>
           <div>
-            <span className="text-sm font-black text-ink tracking-tight block leading-tight">MediNova</span>
+            <span className="text-sm font-black text-ink tracking-tight block leading-tight">Genova</span>
             <span className="text-[8px] font-black text-primary tracking-widest uppercase block leading-none">HEALTHCARE OS</span>
           </div>
         </div>
@@ -336,9 +336,9 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
             <div className="absolute right-0 mt-2 w-64 bg-white rounded-card shadow-dropdown border border-border p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="px-3 py-2 border-b border-border-light mb-1">
                 <div className="font-bold text-sm text-ink">{profile?.name || 'Stevan Dux'}</div>
-                <div className="text-xs text-ink-muted truncate">{profile?.email || 'stevan@medinova.health'}</div>
+                <div className="text-xs text-ink-muted truncate">{profile?.email || 'stevan@genova.health'}</div>
                 <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary-light text-primary text-[10px] font-bold">
-                  <ShieldCheck className="w-3 h-3" /> MediNova {profile?.tier || 'Standard'}
+                  <ShieldCheck className="w-3 h-3" /> Genova {profile?.tier || 'Standard'}
                 </div>
               </div>
 
@@ -377,7 +377,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-semibold text-primary hover:bg-primary-light/50 transition-colors cursor-pointer text-left"
                 >
-                  <Zap className="w-4 h-4 text-cyan" /> MediNova Pro Upgrade
+                  <Zap className="w-4 h-4 text-cyan" /> Genova Pro Upgrade
                 </button>
                 <div className="h-[1px] bg-border-light my-1" />
                 <button

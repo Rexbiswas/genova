@@ -53,7 +53,7 @@ export const Sidebar: React.FC = () => {
   return (
     <>
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-40 bg-white border-r border-border transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[2px_0_16px_rgba(15,23,42,0.04)] flex flex-col ${
+        className={`fixed top-0 left-0 bottom-0 z-40 bg-white border-r border-border no-scrollbar transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[2px_0_16px_rgba(15,23,42,0.04)] flex flex-col ${
           sidebarCollapsed ? 'w-[76px]' : 'w-[260px]'
         } hidden md:flex`}
       >
@@ -79,14 +79,14 @@ export const Sidebar: React.FC = () => {
           </div>
           {!sidebarCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">
-              <span className="text-xl font-extrabold text-ink tracking-tight leading-none">MediNova</span>
+              <span className="text-xl font-extrabold text-ink tracking-tight leading-none">Genova</span>
               <span className="text-[9px] font-bold tracking-widest text-primary uppercase mt-1">HEALTHCARE OS</span>
             </div>
           )}
         </div>
 
         {/* Navigation Menu */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1.5" data-lenis-prevent>
+        <div className="flex-1 overflow-y-auto no-scrollbar px-3 py-4 flex flex-col gap-1.5" data-lenis-prevent>
           {!sidebarCollapsed && (
             <span className="text-[10px] font-bold text-ink-muted/80 tracking-wider px-3 mb-1 uppercase">
               Menu
@@ -153,10 +153,10 @@ export const Sidebar: React.FC = () => {
           {sidebarCollapsed ? (
             <button
               onClick={openProModal}
-              onMouseEnter={e => handleMouseEnter(e, 'MediNova Pro AI')}
+              onMouseEnter={e => handleMouseEnter(e, 'Genova Pro AI')}
               onMouseLeave={handleMouseLeave}
               className="w-11 h-11 rounded-xl bg-gradient-to-br from-navy to-navy-dark border border-cyan/30 text-cyan flex items-center justify-center shadow-lg hover:scale-105 transition-all cursor-pointer mx-auto group"
-              title="MediNova Pro"
+              title="Genova Pro"
             >
               <Zap className="w-5 h-5 animate-pulse-glow" />
             </button>
@@ -168,7 +168,7 @@ export const Sidebar: React.FC = () => {
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
               </div>
-              <strong className="block text-sm font-bold tracking-tight">MediNova Pro</strong>
+              <strong className="block text-sm font-bold tracking-tight">Genova Pro</strong>
               <p className="text-[11px] text-slate-300 mt-1 mb-3 leading-relaxed">
                 Unlimited 24/7 priority teleconsults & automated lab triage.
               </p>

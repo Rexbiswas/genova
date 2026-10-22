@@ -92,13 +92,13 @@ export const AppLayout: React.FC = () => {
       <InstantConsultationModal />
       <MobileSearchOverlay />
 
-      {/* MediNova Pro Subscription Modal */}
-      <Modal isOpen={proModalOpen} onClose={closeProModal} title="MediNova Pro Health Plan">
+      {/* Genova Pro Subscription Modal */}
+      <Modal isOpen={proModalOpen} onClose={closeProModal} title="Genova Pro Health Plan">
         <div className="text-center py-2">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-cyan flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-primary/30">
             <Zap className="w-7 h-7 fill-white" />
           </div>
-          <h4 className="text-xl font-extrabold text-ink">Upgrade to MediNova AI+</h4>
+          <h4 className="text-xl font-extrabold text-ink">Upgrade to Genova AI+</h4>
           <p className="text-xs text-ink-muted max-w-sm mx-auto mt-2 leading-relaxed">
             Get 24/7 priority access to world-class doctors, automated AI lab report triage, zero consultation wait times, and direct multi-specialist care coordination.
           </p>

@@ -34,7 +34,7 @@ export const SettingsPage: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold">MediNova {profile?.tier || 'Standard'}</h3>
+              <h3 className="text-lg font-bold">Genova {profile?.tier || 'Standard'}</h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan/20 text-cyan">ACTIVE</span>
             </div>
             <p className="text-xs text-slate-300 mt-0.5">

@@ -93,6 +93,15 @@
   .bg-gradient-pro {
     background: linear-gradient(145deg, #092846 0%, #0b3a66 100%);
   }
+
+  /* Hide scrollbar utility for sidebars and clean overflow panels */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Lenis smooth scrolling integration */
