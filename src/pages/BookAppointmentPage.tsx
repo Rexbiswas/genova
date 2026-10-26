@@ -353,7 +353,7 @@ export const BookAppointmentPage: React.FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-ink-muted">Consultation Fee:</span>
-              <span className="font-extrabold text-primary text-sm">${selectedDoctor?.price}</span>
+              <span className="font-extrabold text-primary text-sm">₹{selectedDoctor?.price}</span>
             </div>
           </div>
 

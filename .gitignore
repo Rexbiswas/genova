@@ -26,4 +26,9 @@ dist-ssr
 
 # Environment
 .env
-.env.production
+.env.*
+!.env.example
+
+# Uploads & local storage
+uploads
+server/uploads

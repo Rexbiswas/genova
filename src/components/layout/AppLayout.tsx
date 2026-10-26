@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
@@ -17,6 +17,7 @@ import { gsap } from '../../animations/gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Zap, Crown, Check } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { AuthModal } from '../auth/AuthModal';
 
 export const AppLayout: React.FC = () => {
   const {
@@ -61,6 +62,9 @@ export const AppLayout: React.FC = () => {
     };
   }, [prefersReducedMotion]);
 
+  const location = useLocation();
+  const isAIAssistant = location.pathname.startsWith('/ai-assistant');
+
   return (
     <div className="min-h-screen bg-background flex flex-col antialiased">
       {/* Fixed Desktop Sidebar */}
@@ -77,7 +81,13 @@ export const AppLayout: React.FC = () => {
       >
         <Header />
 
-        <main className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-6 max-w-7xl w-full mx-auto flex flex-col">
+        <main
+          className={`flex-1 w-full flex flex-col ${
+            isAIAssistant
+              ? 'px-2 sm:px-4 lg:px-6 py-2 sm:py-3 pb-20 md:pb-4 max-w-none'
+              : 'px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-6 max-w-7xl mx-auto'
+          }`}
+        >
           <PageTransition>
             <Outlet />
           </PageTransition>
@@ -91,6 +101,7 @@ export const AppLayout: React.FC = () => {
       <BookingModal />
       <InstantConsultationModal />
       <MobileSearchOverlay />
+      <AuthModal />
 
       {/* Genova Pro Subscription Modal */}
       <Modal isOpen={proModalOpen} onClose={closeProModal} title="Genova Pro Health Plan">

@@ -27,7 +27,7 @@ Better Care. Smarter Connections.
 |---|---|
 | **Core** | React 18 / 19, TypeScript (Strict Mode), Vite |
 | **Routing** | React Router DOM v6 with code-splitting (`React.lazy` & `Suspense`) |
-| **Styling** | Tailwind CSS with custom MediNova tokens & Vanilla CSS variables |
+| **Styling** | Tailwind CSS with custom Genova tokens & Vanilla CSS variables |
 | **Animations** | GSAP 3, `@gsap/react`, ScrollTrigger |
 | **Smooth Scroll** | Lenis (`lenis`) |
 | **Icons** | Lucide React |
@@ -63,13 +63,22 @@ Available variables:
 
 ### 4. Development Server
 
-Start Vite local dev server with Hot Module Replacement (HMR):
+Start both frontend and backend server concurrently with a single command:
 
 ```bash
-npm run dev
+npm run dev:all
 ```
 
-The application will be accessible at: `http://localhost:3000`
+Or start individual services separately:
+
+- **Frontend only** (Vite on `http://localhost:3000`):
+  ```bash
+  npm run dev
+  ```
+- **Backend Server only** (Express on `http://localhost:5000`):
+  ```bash
+  npm run dev:server
+  ```
 
 ---
 
@@ -116,4 +125,4 @@ src/
 
 ## 📄 License
 
-Proprietary © MediNova Healthcare OS. All rights reserved.
+Proprietary © Genova Healthcare OS. All rights reserved.

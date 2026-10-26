@@ -1,8 +1,8 @@
 import { NotificationItem } from '../types/notification';
 import { initialNotifications } from '../data/demoData';
-import { apiFetch, IS_DEMO_MODE } from './apiClient';
+import { apiFetch, getAppMode } from './apiClient';
 
-const STORAGE_KEY = 'medinova_notifications';
+const STORAGE_KEY = 'genova_demo_notifications';
 
 function getStoredNotifications(): NotificationItem[] {
   try {
@@ -27,33 +27,35 @@ function saveStoredNotifications(items: NotificationItem[]) {
 
 export const notificationService = {
   async getNotifications(): Promise<NotificationItem[]> {
-    if (!IS_DEMO_MODE) {
-      try {
-        return await apiFetch<NotificationItem[]>('/notifications');
-      } catch (err) {
-        console.warn('Backend /notifications unavailable, falling back', err);
-      }
+    if (getAppMode() === 'demo') {
+      return getStoredNotifications();
     }
-    return getStoredNotifications();
+    try {
+      return await apiFetch<NotificationItem[]>('/notifications');
+    } catch (err) {
+      console.warn('[NotificationService] Backend unauthenticated or unavailable, using local notifications:', err);
+      return getStoredNotifications();
+    }
   },
 
   async markAsRead(id: string): Promise<void> {
-    if (!IS_DEMO_MODE) {
-      try {
-        await apiFetch(`/notifications/${id}/read`, { method: 'PATCH' });
-      } catch (err) {
-        console.warn('Backend markAsRead unavailable', err);
-      }
+    if (getAppMode() === 'demo') {
+      const current = getStoredNotifications();
+      const updated = current.map(n => (n.id === id ? { ...n, read: true } : n));
+      saveStoredNotifications(updated);
+      return;
     }
-    const current = getStoredNotifications();
-    const updated = current.map(n => (n.id === id ? { ...n, read: true } : n));
-    saveStoredNotifications(updated);
+    await apiFetch(`/notifications/${id}/read`, { method: 'PATCH' });
   },
 
   async markAllAsRead(): Promise<void> {
-    const current = getStoredNotifications();
-    const updated = current.map(n => ({ ...n, read: true }));
-    saveStoredNotifications(updated);
+    if (getAppMode() === 'demo') {
+      const current = getStoredNotifications();
+      const updated = current.map(n => ({ ...n, read: true }));
+      saveStoredNotifications(updated);
+      return;
+    }
+    await apiFetch('/notifications/mark-all-read', { method: 'PATCH' });
   },
 
   async addNotification(title: string, message: string, type: NotificationItem['type'] = 'appointment'): Promise<NotificationItem> {

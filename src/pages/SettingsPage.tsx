@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Settings, Bell, Shield, Globe, Crown, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, Bell, Shield, Globe, Crown, Check, ChevronLeft } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { Button } from '../components/ui/Button';
 
 export const SettingsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { profile, openProModal, showToast } = useApp();
 
   const [emailAlerts, setEmailAlerts] = useState(true);
@@ -17,13 +19,22 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12 max-w-4xl mx-auto">
       {/* Title */}
-      <div>
-        <span className="text-xs font-bold text-primary uppercase tracking-wider block">PREFERENCES</span>
-        <h1 className="text-2xl font-extrabold text-ink tracking-tight flex items-center gap-2">
-          <span>Account Settings</span>
-          <Settings className="w-5 h-5 text-primary" />
-        </h1>
-        <p className="text-xs text-ink-muted">Configure notifications, security, and telemedicine preferences</p>
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-9 h-9 rounded-xl bg-white border border-border text-ink-muted hover:text-ink hover:border-primary/40 hover:bg-slate-50 flex items-center justify-center transition-all shadow-xs cursor-pointer shrink-0"
+          aria-label="Back"
+        >
+          <ChevronLeft className="w-5 h-5 text-ink" />
+        </button>
+        <div>
+          <span className="text-xs font-bold text-primary uppercase tracking-wider block">PREFERENCES</span>
+          <h1 className="text-2xl font-extrabold text-ink tracking-tight flex items-center gap-2">
+            <span>Account Settings</span>
+            <Settings className="w-5 h-5 text-primary" />
+          </h1>
+          <p className="text-xs text-ink-muted">Configure notifications, security, and telemedicine preferences</p>
+        </div>
       </div>
 
       {/* Plan & Tier Card */}

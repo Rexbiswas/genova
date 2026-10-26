@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, Check, CalendarCheck, CircleDollarSign, CalendarPlus, Star } from 'lucide-react';
+import { Sparkles, ArrowRight, Check, CalendarCheck, IndianRupee, CalendarPlus, Star } from 'lucide-react';
 import { useDoctors } from '../../hooks/useDoctors';
 import { useApp } from '../../contexts/AppContext';
 
@@ -90,9 +90,9 @@ export const RecommendedDoctors: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 pl-3 border-l border-border-light">
-                  <CircleDollarSign className="w-4 h-4 text-primary shrink-0" />
+                  <IndianRupee className="w-4 h-4 text-primary shrink-0" />
                   <div className="leading-tight min-w-0">
-                    <b className="text-ink text-[11px] block truncate">${doctor.price}</b>
+                    <b className="text-ink text-[11px] block truncate">₹{doctor.price}</b>
                     <small className="text-ink-muted text-[10px] block truncate">Starting fee</small>
                   </div>
                 </div>

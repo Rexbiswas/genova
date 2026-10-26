@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Users, User } from 'lucide-react';
+import { Home, Bot, FolderHeart, Users, User } from 'lucide-react';
 
 export const BottomNavigation: React.FC = () => {
   const navTabs = [
     { to: '/dashboard', label: 'Home', icon: Home },
-    { to: '/calendar', label: 'Calendar', icon: Calendar },
+    { to: '/ai-assistant', label: 'AI Assist', icon: Bot },
+    { to: '/records', label: 'Records', icon: FolderHeart },
     { to: '/doctors', label: 'Doctors', icon: Users },
     { to: '/profile', label: 'Profile', icon: User },
   ];

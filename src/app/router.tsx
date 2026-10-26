@@ -14,6 +14,9 @@ const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
 const HelpPage = lazy(() => import('../pages/HelpPage'));
 const SettingsPage = lazy(() => import('../pages/SettingsPage'));
+const AIAssistantPage = lazy(() => import('../pages/AIAssistantPage'));
+const HealthRecordsPage = lazy(() => import('../pages/HealthRecordsPage'));
+const MedicationsPage = lazy(() => import('../pages/MedicationsPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const UnauthorizedPage = lazy(() => import('../pages/UnauthorizedPage'));
 
@@ -46,6 +49,30 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageFallback />}>
             <DashboardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'ai-assistant',
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <AIAssistantPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'records',
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <HealthRecordsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'medications',
+        element: (
+          <Suspense fallback={<PageFallback />}>
+            <MedicationsPage />
           </Suspense>
         ),
       },

@@ -1,7 +1,7 @@
 import { SupportTicket } from '../types/user';
 import { apiFetch, IS_DEMO_MODE } from './apiClient';
 
-const STORAGE_KEY = 'medinova_support_tickets';
+const STORAGE_KEY = 'genova_support_tickets';
 
 function getStoredTickets(): SupportTicket[] {
   try {

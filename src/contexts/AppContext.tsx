@@ -67,7 +67,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // UI States
   const [sidebarCollapsed, setSidebarCollapsedState] = useState<boolean>(() => {
-    const saved = localStorage.getItem('medinova_sidebar_collapsed');
+    const saved = localStorage.getItem('genova_sidebar_collapsed');
     return saved ? saved === 'true' : false;
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -80,7 +80,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Mobile Favorites & Recent Searches
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('medinova_doctor_favorites');
+      const saved = localStorage.getItem('genova_doctor_favorites');
       return saved ? JSON.parse(saved) : ['doc-1'];
     } catch {
       return ['doc-1'];
@@ -89,7 +89,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('medinova_recent_searches');
+      const saved = localStorage.getItem('genova_recent_searches');
       return saved ? JSON.parse(saved) : ['Cardiologist', 'Dermatologist', 'Pediatrician'];
     } catch {
       return ['Cardiologist', 'Dermatologist', 'Pediatrician'];
@@ -106,13 +106,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setSidebarCollapsed = useCallback((collapsed: boolean) => {
     setSidebarCollapsedState(collapsed);
-    localStorage.setItem('medinova_sidebar_collapsed', String(collapsed));
+    localStorage.setItem('genova_sidebar_collapsed', String(collapsed));
   }, []);
 
   const toggleSidebar = useCallback(() => {
     setSidebarCollapsedState(prev => {
       const next = !prev;
-      localStorage.setItem('medinova_sidebar_collapsed', String(next));
+      localStorage.setItem('genova_sidebar_collapsed', String(next));
       return next;
     });
   }, []);
@@ -122,7 +122,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const exists = prev.includes(doctorId);
       const next = exists ? prev.filter(id => id !== doctorId) : [...prev, doctorId];
       try {
-        localStorage.setItem('medinova_doctor_favorites', JSON.stringify(next));
+        localStorage.setItem('genova_doctor_favorites', JSON.stringify(next));
       } catch (e) {
         console.error(e);
       }
@@ -137,7 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRecentSearches(prev => {
       const next = [clean, ...prev.filter(item => item.toLowerCase() !== clean.toLowerCase())].slice(0, 6);
       try {
-        localStorage.setItem('medinova_recent_searches', JSON.stringify(next));
+        localStorage.setItem('genova_recent_searches', JSON.stringify(next));
       } catch (e) {
         console.error(e);
       }
@@ -147,34 +147,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const clearRecentSearches = useCallback(() => {
     setRecentSearches([]);
-    localStorage.removeItem('medinova_recent_searches');
+    localStorage.removeItem('genova_recent_searches');
     showToast('Recent searches cleared', 'info');
   }, [showToast]);
 
   // Initial Data Fetch
   useEffect(() => {
+    let isMounted = true;
+
     async function init() {
       try {
         setLoading(true);
-        const [loadedDocs, loadedApts, loadedNotifs, loadedProfile] = await Promise.all([
+        const [docsRes, aptsRes, notifsRes, profileRes] = await Promise.allSettled([
           doctorService.getDoctors(),
           appointmentService.getAppointments(),
           notificationService.getNotifications(),
           profileService.getProfile(),
         ]);
-        setDoctors(loadedDocs);
-        setAppointments(loadedApts);
-        setNotifications(loadedNotifs);
-        setProfile(loadedProfile);
+
+        if (!isMounted) return;
+
+        if (docsRes.status === 'fulfilled' && docsRes.value) {
+          setDoctors(docsRes.value);
+        }
+        if (aptsRes.status === 'fulfilled' && aptsRes.value) {
+          setAppointments(aptsRes.value);
+        }
+        if (notifsRes.status === 'fulfilled' && notifsRes.value) {
+          setNotifications(notifsRes.value);
+        }
+        if (profileRes.status === 'fulfilled' && profileRes.value) {
+          setProfile(profileRes.value);
+        }
       } catch (err) {
-        console.error('Failed to load initial data', err);
-        showToast('Error connecting to services', 'error');
+        console.warn('[AppContext] Initial data load fallback active:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
+
     init();
-  }, [showToast]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const openBookingModal = useCallback((doc?: Doctor | null) => {
     setBookingDoctor(doc || doctors[0] || null);

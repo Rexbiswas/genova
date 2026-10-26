@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { LocationPin } from '../ui/LocationPin';
 import { useApp } from '../../contexts/AppContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
   onSearchSubmit?: (query: string) => void;
@@ -36,7 +37,10 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
     setMobileMenuOpen,
     openProModal,
     showToast,
+    openSearchOverlay,
   } = useApp();
+
+  const { logout, openAuthModal, isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
 
@@ -44,6 +48,34 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationTerm, setLocationTerm] = useState('Braga, Portugal');
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Search input ref & OS detection
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const isMac = typeof window !== 'undefined' && /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
+
+  // Global Ctrl+K / Cmd+K shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Ctrl+K or Cmd+K
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        if (window.innerWidth < 768) {
+          openSearchOverlay();
+        } else {
+          searchInputRef.current?.focus();
+          searchInputRef.current?.select();
+        }
+      }
+
+      // Escape key blurs search input
+      if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [openSearchOverlay]);
 
   // Popover States
   const [langOpen, setLangOpen] = useState(false);
@@ -146,24 +178,30 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
         </div>
       </div>
 
-      {/* Center: Search & Location Pill */}
+      {/* Center: Search Pill with Cmd+K / Ctrl+K */}
       <form
         onSubmit={handleSearchSubmit}
-        className="hidden md:flex items-center bg-white border border-border rounded-control p-1 shadow-sm max-w-xl flex-1 mx-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all"
+        onClick={() => searchInputRef.current?.focus()}
+        className="hidden md:flex items-center bg-white border border-border/80 rounded-2xl px-3 py-1.5 shadow-xs max-w-2xl flex-1 mx-4 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all cursor-text"
       >
-        <div className="flex items-center gap-2 px-3 flex-1">
+        <div className="flex items-center gap-2.5 flex-1">
           <Search className="w-4 h-4 text-ink-muted shrink-0" />
           <input
+            ref={searchInputRef}
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search doctors, symptoms, specialties..."
+            placeholder="Search doctors, symptoms, reports, or ask Genova AI..."
             className="w-full text-xs font-medium text-ink bg-transparent outline-none placeholder:text-ink-muted/70"
           />
           {searchTerm && (
             <button
               type="button"
-              onClick={() => setSearchTerm('')}
+              onClick={e => {
+                e.stopPropagation();
+                setSearchTerm('');
+                searchInputRef.current?.focus();
+              }}
               className="text-ink-muted hover:text-ink p-0.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
@@ -171,47 +209,34 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
           )}
         </div>
 
-        <div className="h-5 w-[1px] bg-border shrink-0" />
-
-        <div className="flex items-center gap-2 px-3 flex-1 max-w-[200px]">
-          {/* <LocationPin className="w-4 h-4 text-primary shrink-0" /> */}
-          <input
-            type="text"
-            value={locationTerm}
-            onChange={e => setLocationTerm(e.target.value)}
-            placeholder="City or zip..."
-            className="w-full text-xs font-medium text-ink bg-transparent outline-none placeholder:text-ink-muted/70"
-          />
+        <div className="flex items-center gap-1.5 pl-2">
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              searchInputRef.current?.focus();
+            }}
+            className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-ink-muted bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-md shadow-2xs transition-colors cursor-pointer select-none"
+            title={`Focus search (${isMac ? '⌘' : 'Ctrl'} + K)`}
+            aria-label="Focus search"
+          >
+            <span>{isMac ? '⌘' : 'Ctrl'}</span>
+            <span>K</span>
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleDetectLocation}
-          className="p-2 text-ink-muted hover:text-primary rounded-md transition-colors cursor-pointer shrink-0"
-          title="Auto-detect current location"
-        >
-          <LocationPin className="w-4 h-4" />
-        </button>
-
-        <button
-          type="submit"
-          className="bg-primary hover:bg-primary-hover text-white text-xs font-semibold px-4 py-2 rounded-md transition-colors shrink-0 shadow-sm cursor-pointer"
-        >
-          Search
-        </button>
       </form>
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 lg:gap-3">
-        {/* Fullscreen Toggle */}
+        {/* Mobile Search Button */}
         <button
-          onClick={toggleFullscreen}
-          className="hidden lg:flex w-9 h-9 rounded-control bg-white border border-border items-center justify-center text-ink-muted hover:text-primary hover:border-primary/40 transition-colors shadow-sm cursor-pointer"
-          title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Mode'}
+          onClick={openSearchOverlay}
+          className="md:hidden w-9 h-9 rounded-control bg-white border border-border flex items-center justify-center text-ink-muted hover:text-primary transition-colors shadow-xs cursor-pointer"
+          title="Search"
+          aria-label="Search"
         >
-          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          <Search className="w-4 h-4" />
         </button>
-
         {/* Language Selector Popover (Desktop / Tablet) */}
         <div ref={langRef} className="relative hidden sm:block">
           <button
@@ -380,15 +405,28 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
                   <Zap className="w-4 h-4 text-cyan" /> Genova Pro Upgrade
                 </button>
                 <div className="h-[1px] bg-border-light my-1" />
-                <button
-                  onClick={() => {
-                    showToast('Signed out of demo session');
-                    setUserMenuOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-error hover:bg-red-50 transition-colors cursor-pointer text-left"
-                >
-                  <LogOut className="w-4 h-4 text-error" /> Sign Out
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={async () => {
+                      await logout();
+                      showToast('Signed out successfully', 'info');
+                      setUserMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-error hover:bg-red-50 transition-colors cursor-pointer text-left"
+                  >
+                    <LogOut className="w-4 h-4 text-error" /> Sign Out
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      openAuthModal();
+                      setUserMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-semibold text-primary hover:bg-primary-light/50 transition-colors cursor-pointer text-left"
+                  >
+                    <UserIcon className="w-4 h-4 text-primary" /> Sign In / Register
+                  </button>
+                )}
               </div>
             </div>
           )}

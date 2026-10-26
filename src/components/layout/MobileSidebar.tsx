@@ -12,6 +12,9 @@ import {
   LogOut,
   X,
   ArrowRight,
+  Bot,
+  FolderHeart,
+  Pill,
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { gsap } from '../../animations/gsap';
@@ -48,6 +51,9 @@ export const MobileSidebar: React.FC = () => {
 
   const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
+    { to: '/ai-assistant', label: 'AI Assistant', icon: Bot, badge: 'AI', badgeColor: 'bg-cyan text-white' },
+    { to: '/records', label: 'Health Records', icon: FolderHeart },
+    { to: '/medications', label: 'Medications', icon: Pill },
     { to: '/calendar', label: 'Calendar', icon: CalendarCheck, badge: '3', badgeColor: 'bg-cyan text-white' },
     { to: '/doctors', label: 'Doctors', icon: Stethoscope },
     { to: '/appointments', label: 'Appointments', icon: Clock },
