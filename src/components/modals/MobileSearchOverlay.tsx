@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, ArrowLeft, Clock, Stethoscope, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, X, ArrowLeft, Clock, Stethoscope, ChevronRight, Trash2, Mic } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 
 export const MobileSearchOverlay: React.FC = () => {
-  const { searchOverlayOpen, closeSearchOverlay, recentSearches, addRecentSearch, clearRecentSearches, doctors } = useApp();
+  const { searchOverlayOpen, closeSearchOverlay, recentSearches, addRecentSearch, clearRecentSearches, doctors, showToast } = useApp();
   const [query, setQuery] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -57,6 +59,66 @@ export const MobileSearchOverlay: React.FC = () => {
     }
   };
 
+  const handleVoiceSearch = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      showToast('Speech recognition is not supported in this browser', 'info');
+      return;
+    }
+
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        showToast('Listening... Speak your search query', 'info');
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if (transcript) {
+          setQuery(transcript);
+          showToast(`Voice input: "${transcript}"`, 'success');
+          inputRef.current?.focus();
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event: any) => {
+        setIsListening(false);
+        if (event.error !== 'no-speech') {
+          showToast('Could not recognize voice. Please try again.', 'error');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error('Speech recognition error:', err);
+      setIsListening(false);
+      showToast('Microphone access was denied or unavailable', 'error');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -101,6 +163,19 @@ export const MobileSearchOverlay: React.FC = () => {
               <X className="w-3.5 h-3.5" />
             </button>
           )}
+          <button
+            type="button"
+            onClick={handleVoiceSearch}
+            className={`p-1 rounded-lg transition-all cursor-pointer shrink-0 ${
+              isListening
+                ? 'bg-red-50 text-red-500 animate-pulse ring-2 ring-red-300'
+                : 'text-ink-muted hover:text-primary hover:bg-slate-100'
+            }`}
+            title={isListening ? 'Listening... click to stop' : 'Search by voice'}
+            aria-label={isListening ? 'Stop voice search' : 'Search by voice'}
+          >
+            <Mic className="w-4 h-4" />
+          </button>
         </div>
 
         <button

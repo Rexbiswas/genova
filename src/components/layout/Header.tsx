@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Menu,
   Search,
   MapPin,
   Crosshair,
@@ -18,6 +17,7 @@ import {
   Zap,
   LogOut,
   X,
+  Mic,
 } from 'lucide-react';
 import { LocationPin } from '../ui/LocationPin';
 import { useApp } from '../../contexts/AppContext';
@@ -34,7 +34,6 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
     unreadCount,
     markNotificationAsRead,
     markAllNotificationsAsRead,
-    setMobileMenuOpen,
     openProModal,
     showToast,
     openSearchOverlay,
@@ -48,6 +47,8 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationTerm, setLocationTerm] = useState('Braga, Portugal');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   // Search input ref & OS detection
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -136,6 +137,65 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
     }
   };
 
+  const handleVoiceSearch = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      showToast('Speech recognition is not supported in this browser', 'info');
+      return;
+    }
+
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = currentLang === 'es' ? 'es-ES' : currentLang === 'fr' ? 'fr-FR' : 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        showToast('Listening... Speak your search query', 'info');
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if (transcript) {
+          setSearchTerm(transcript);
+          showToast(`Voice input: "${transcript}"`, 'success');
+          searchInputRef.current?.focus();
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event: any) => {
+        setIsListening(false);
+        if (event.error !== 'no-speech') {
+          showToast('Could not recognize voice. Please try again.', 'error');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error('Speech recognition error:', err);
+      setIsListening(false);
+      showToast('Microphone access was denied or unavailable', 'error');
+    }
+  };
+
   const languages = [
     { code: 'en', label: 'English (US)', flag: '🇺🇸' },
     { code: 'es', label: 'Español', flag: '🇪🇸' },
@@ -146,16 +206,8 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
 
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md px-4 lg:px-8 py-4 flex items-center justify-between gap-4 border-b border-border/60 transition-all">
-      {/* Left: Mobile Menu & Greeting */}
+      {/* Left: Mobile Brand & Greeting */}
       <div className="flex items-center gap-2.5 sm:gap-3">
-        <button
-          onClick={() => setMobileMenuOpen(true)}
-          className="md:hidden p-2 rounded-control bg-white border border-border text-ink hover:text-primary transition-colors cursor-pointer"
-          aria-label="Open navigation menu"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-
         {/* Mobile Brand Title (Screen 1) */}
         <div className="flex items-center gap-2 md:hidden">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan flex items-center justify-center text-white shadow-xs">
@@ -212,16 +264,16 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
         <div className="flex items-center gap-1.5 pl-2">
           <button
             type="button"
-            onClick={e => {
-              e.stopPropagation();
-              searchInputRef.current?.focus();
-            }}
-            className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-ink-muted bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-md shadow-2xs transition-colors cursor-pointer select-none"
-            title={`Focus search (${isMac ? '⌘' : 'Ctrl'} + K)`}
-            aria-label="Focus search"
+            onClick={handleVoiceSearch}
+            className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+              isListening
+                ? 'bg-red-50 text-red-500 animate-pulse ring-2 ring-red-300'
+                : 'text-ink-muted hover:text-primary hover:bg-slate-100'
+            }`}
+            title={isListening ? 'Listening... click to stop' : 'Search by voice'}
+            aria-label={isListening ? 'Stop voice search' : 'Search by voice'}
           >
-            <span>{isMac ? '⌘' : 'Ctrl'}</span>
-            <span>K</span>
+            <Mic className="w-4 h-4" />
           </button>
         </div>
       </form>
