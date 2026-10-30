@@ -93,9 +93,11 @@ export const MobileSidebar: React.FC = () => {
         {/* Brand & Close (Screen 10) */}
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00ADEF] via-[#0098DA] to-[#0082C5] flex items-center justify-center text-white shadow-xs p-1.5 shrink-0">
-              <HeartPulse className="w-full h-full stroke-[2.6]" />
-            </div>
+            <img
+              src="/images/genova_heart_logo.png"
+              alt="Genova"
+              className="w-8 h-8 rounded-xl shrink-0 object-contain shadow-xs select-none"
+            />
             <div>
               <span className="text-base font-black text-ink tracking-tight block leading-tight">Genova</span>
               <span className="text-[8px] font-black text-primary tracking-widest uppercase block leading-none">HEALTHCARE OS</span>

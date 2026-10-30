@@ -113,9 +113,11 @@ export const Sidebar: React.FC = () => {
 
         {/* Brand Header */}
         <div className={`p-5 border-b border-slate-100 flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00ADEF] via-[#0098DA] to-[#0082C5] flex items-center justify-center text-white shadow-md shadow-sky-500/25 p-1.5 shrink-0">
-            <HeartPulse className="w-full h-full stroke-[2.6]" />
-          </div>
+          <img
+            src="/images/genova_heart_logo.png"
+            alt="Genova"
+            className="w-9 h-9 rounded-xl shrink-0 object-contain shadow-xs select-none"
+          />
           {!sidebarCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">
               <span className="text-lg font-black text-ink tracking-tight leading-none">Genova</span>
