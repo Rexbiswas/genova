@@ -35,6 +35,11 @@ export const CompleteProfilePage: React.FC = () => {
       showToast('Profile updated successfully! Welcome to Genova.', 'success');
       navigate('/dashboard', { replace: true });
     } catch (err: any) {
+      if (err.statusCode === 401 || err.message?.includes('session') || err.message?.includes('longer exists')) {
+        showToast('Your session has expired. Please sign in or register.', 'error');
+        navigate('/login', { replace: true });
+        return;
+      }
       setErrorMessage(err.message || 'Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
@@ -42,6 +47,10 @@ export const CompleteProfilePage: React.FC = () => {
   };
 
   const handleSkipForNow = () => {
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
+    }
     navigate('/dashboard', { replace: true });
   };
 

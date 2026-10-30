@@ -106,13 +106,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateProfile = async (data: Partial<UserProfile>): Promise<UserProfile> => {
-    const res = await apiFetch<UserProfile>('/users/me', {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
+    try {
+      const res = await apiFetch<UserProfile>('/users/me', {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
 
-    setUser(res);
-    return res;
+      setUser(res);
+      return res;
+    } catch (err: any) {
+      if (err.statusCode === 401) {
+        localStorage.removeItem('genova_token');
+        setUser(null);
+      }
+      throw err;
+    }
   };
 
   const logout = async (): Promise<void> => {

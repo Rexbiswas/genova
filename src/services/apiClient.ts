@@ -58,6 +58,9 @@ export async function apiFetch<T>(
     clearTimeout(timeoutId);
 
     if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem('genova_token');
+      }
       const errorBody = await res.json().catch(() => ({ message: res.statusText }));
       throw new ApiError(
         res.status,

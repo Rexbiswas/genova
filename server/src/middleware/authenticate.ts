@@ -42,6 +42,7 @@ export async function authenticate(
     const user = await User.findById(decoded.userId);
 
     if (!user) {
+      res.clearCookie('token');
       res.status(401).json({
         success: false,
         message: 'Invalid session. User no longer exists.',
@@ -52,6 +53,7 @@ export async function authenticate(
     req.user = user;
     next();
   } catch (error) {
+    res.clearCookie('token');
     res.status(401).json({
       success: false,
       message: 'Invalid or expired authentication session.',
