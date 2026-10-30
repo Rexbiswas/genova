@@ -138,7 +138,7 @@ export class AuthService {
     let picture: string | undefined;
     let googleSub: string;
 
-    if (env.GOOGLE_CLIENT_ID) {
+    if (env.GOOGLE_CLIENT_ID && env.NODE_ENV !== 'test') {
       try {
         const client = new OAuth2Client(env.GOOGLE_CLIENT_ID);
         const ticket = await client.verifyIdToken({

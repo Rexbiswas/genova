@@ -84,12 +84,32 @@ export async function triggerGoogleSignIn(
         }
       },
     });
+
     window.google.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed()) {
-        console.info('[GoogleAuth] Prompt not displayed:', notification.getNotDisplayedReason());
-      }
-      if (notification.isSkippedMoment()) {
-        console.info('[GoogleAuth] Moment skipped:', notification.getSkippedReason());
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        // Fallback: render and click standard GIS button if OneTap is suppressed
+        try {
+          const container = document.createElement('div');
+          container.style.position = 'fixed';
+          container.style.top = '-9999px';
+          container.style.left = '-9999px';
+          container.style.opacity = '0';
+          document.body.appendChild(container);
+
+          window.google!.accounts!.id.renderButton(container, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+          });
+
+          const btn = container.querySelector('div[role="button"]') as HTMLElement | null;
+          if (btn) {
+            btn.click();
+          }
+          setTimeout(() => container.remove(), 10000);
+        } catch (e) {
+          console.warn('[GoogleAuth] Fallback button trigger exception:', e);
+        }
       }
     });
     return;

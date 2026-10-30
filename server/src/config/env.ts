@@ -22,4 +22,5 @@ export const env = {
   STORAGE_DIR: path.resolve(__dirname, '../../uploads'),
   MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB || '15', 10),
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
 };
