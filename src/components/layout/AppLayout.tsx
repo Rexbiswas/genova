@@ -31,9 +31,17 @@ export const AppLayout: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
   const lenisRef = useRef<Lenis | null>(null);
 
-  // Initialize Lenis Smooth Scroll & Sync with GSAP
+  // Initialize Lenis Smooth Scroll & Sync with GSAP (Desktop only)
   useEffect(() => {
     if (prefersReducedMotion) return;
+
+    // Do NOT run virtual smooth-scroll on mobile / touch devices.
+    // Native mobile touch momentum scrolling (120Hz) is superior,
+    // and Lenis on mobile interferes with dynamic viewport height (dvh) and fixed bottom navigation.
+    const isTouchOrMobile =
+      typeof window !== 'undefined' &&
+      (window.innerWidth < 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0);
+    if (isTouchOrMobile) return;
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -66,7 +74,7 @@ export const AppLayout: React.FC = () => {
   const isAIAssistant = location.pathname.startsWith('/ai-assistant');
 
   return (
-    <div className="min-h-screen bg-background flex flex-col antialiased">
+    <div className="min-h-screen min-h-[100dvh] bg-background flex flex-col antialiased">
       {/* Fixed Desktop Sidebar */}
       <Sidebar />
 
@@ -85,7 +93,7 @@ export const AppLayout: React.FC = () => {
           className={`flex-1 w-full flex flex-col ${
             isAIAssistant
               ? 'px-2 sm:px-4 lg:px-6 py-2 sm:py-3 pb-20 md:pb-4 max-w-none'
-              : 'px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-6 max-w-7xl mx-auto'
+              : 'px-3 sm:px-6 lg:px-8 pt-2.5 pb-24 sm:pt-4 sm:pb-8 md:py-6 max-w-7xl mx-auto'
           }`}
         >
           <PageTransition>

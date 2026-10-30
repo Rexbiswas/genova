@@ -21,4 +21,5 @@ export const env = {
   AI_MODEL: process.env.AI_MODEL || 'gemini-1.5-flash',
   STORAGE_DIR: path.resolve(__dirname, '../../uploads'),
   MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB || '15', 10),
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
 };

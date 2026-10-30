@@ -25,8 +25,15 @@ const loginSchema = {
   }),
 };
 
+const googleSchema = {
+  body: z.object({
+    credential: z.string().min(10, 'Google credential token is required'),
+  }),
+};
+
 router.post('/register', authRateLimiter, validateRequest(registerSchema), AuthController.register);
 router.post('/login', authRateLimiter, validateRequest(loginSchema), AuthController.login);
+router.post('/google', authRateLimiter, validateRequest(googleSchema), AuthController.googleLogin);
 router.post('/logout', AuthController.logout);
 router.get('/me', authenticate, AuthController.me);
 

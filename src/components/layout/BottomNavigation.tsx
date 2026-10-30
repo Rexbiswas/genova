@@ -8,20 +8,20 @@ export const BottomNavigation: React.FC = () => {
 
   return (
     <nav
-      className={`md:hidden fixed bottom-0 left-0 right-0 z-40 px-3 sm:px-6 pb-2 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform ${
+      className={`mobile-bottom-nav md:hidden fixed left-0 right-0 z-40 px-2.5 sm:px-6 pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform ${
         mobileMenuOpen
-          ? 'translate-y-full opacity-0 pointer-events-none'
-          : 'translate-y-0 opacity-100 pointer-events-auto'
+          ? 'translate-y-full opacity-0'
+          : 'translate-y-0 opacity-100'
       }`}
+      style={{
+        bottom: 'max(0.6rem, env(safe-area-inset-bottom, 0.6rem))',
+      }}
       aria-label="Mobile Navigation"
       aria-hidden={mobileMenuOpen}
     >
-      <div className="relative max-w-md mx-auto">
+      <div className="relative max-w-md mx-auto pointer-events-auto">
         {/* Main Clean Glassmorphic Capsule Bar */}
-        <div
-          className="relative bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_-8px_32px_rgba(9,40,70,0.08),0_4px_20px_rgba(0,0,0,0.04)] rounded-[28px] sm:rounded-[32px] px-2 pt-1.5 pb-2 flex items-center justify-between"
-          style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
-        >
+        <div className="relative bg-white/95 backdrop-blur-2xl border border-white/80 shadow-[0_4px_24px_rgba(9,40,70,0.12),0_-1px_6px_rgba(9,40,70,0.03)] rounded-[26px] sm:rounded-[30px] px-1.5 py-1.5 flex items-center justify-between">
           {/* Tab 1: Home */}
           <NavLink
             to="/dashboard"
@@ -86,15 +86,15 @@ export const BottomNavigation: React.FC = () => {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="flex-1 flex flex-col items-center justify-center relative -top-4 group cursor-pointer select-none"
+            className="flex-1 flex flex-col items-center justify-center relative -top-3.5 group cursor-pointer select-none"
             aria-label="Open menu"
           >
             <div
-              className={`w-[58px] h-[58px] rounded-full bg-gradient-to-tr from-[#007af5] via-[#0099ff] to-[#00d4ff] flex items-center justify-center text-white shadow-[0_8px_24px_rgba(0,160,255,0.42)] group-hover:scale-105 group-active:scale-95 transition-all duration-300 ${
-                mobileMenuOpen ? 'ring-4 ring-primary/25 scale-105 shadow-[0_10px_28px_rgba(0,160,255,0.55)]' : ''
+              className={`w-[54px] h-[54px] rounded-full bg-gradient-to-tr from-[#007af5] via-[#0099ff] to-[#00d4ff] flex items-center justify-center text-white shadow-[0_6px_20px_rgba(0,160,255,0.42)] group-hover:scale-105 group-active:scale-95 transition-all duration-300 ${
+                mobileMenuOpen ? 'ring-4 ring-primary/25 scale-105 shadow-[0_8px_24px_rgba(0,160,255,0.55)]' : ''
               }`}
             >
-              <LayoutGrid className="w-6 h-6 stroke-[2.3] text-white" />
+              <LayoutGrid className="w-5 h-5 stroke-[2.3] text-white" />
             </div>
             <span
               className={`text-[10px] tracking-tight mt-0.5 transition-colors ${

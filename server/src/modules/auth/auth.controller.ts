@@ -39,6 +39,8 @@ export class AuthController {
           emailNotifications: user.emailNotifications,
           smsNotifications: user.smsNotifications,
           twoFactorEnabled: user.twoFactorEnabled,
+          authProvider: user.authProvider,
+          profileCompleted: user.profileCompleted,
         },
       });
     } catch (err) {
@@ -81,6 +83,59 @@ export class AuthController {
           emailNotifications: user.emailNotifications,
           smsNotifications: user.smsNotifications,
           twoFactorEnabled: user.twoFactorEnabled,
+          authProvider: user.authProvider,
+          profileCompleted: user.profileCompleted,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async googleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { credential } = req.body;
+      if (!credential) {
+        res.status(400).json({ success: false, message: 'Google credential token is required' });
+        return;
+      }
+
+      const { user, token, isNewUser } = await AuthService.googleAuth(
+        credential,
+        req.ip,
+        req.headers['user-agent']
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: isNewUser ? 'Google account created successfully' : 'Google sign-in successful',
+        token,
+        isNewUser,
+        user: {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          location: user.location,
+          avatar: user.avatar,
+          role: user.role,
+          tier: user.tier,
+          bloodGroup: user.bloodGroup,
+          dob: user.dob,
+          emergencyContact: user.emergencyContact,
+          preferredLanguage: user.preferredLanguage,
+          emailNotifications: user.emailNotifications,
+          smsNotifications: user.smsNotifications,
+          twoFactorEnabled: user.twoFactorEnabled,
+          authProvider: user.authProvider,
+          profileCompleted: user.profileCompleted,
         },
       });
     } catch (err) {
@@ -121,6 +176,8 @@ export class AuthController {
         emailNotifications: user.emailNotifications,
         smsNotifications: user.smsNotifications,
         twoFactorEnabled: user.twoFactorEnabled,
+        authProvider: user.authProvider,
+        profileCompleted: user.profileCompleted,
       },
     });
   }

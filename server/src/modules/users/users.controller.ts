@@ -22,6 +22,8 @@ export class UsersController {
         emailNotifications: user.emailNotifications,
         smsNotifications: user.smsNotifications,
         twoFactorEnabled: user.twoFactorEnabled,
+        authProvider: user.authProvider,
+        profileCompleted: user.profileCompleted,
       });
     } catch (err) {
       next(err);
@@ -42,6 +44,7 @@ export class UsersController {
         'emailNotifications',
         'smsNotifications',
         'twoFactorEnabled',
+        'profileCompleted',
       ];
 
       const updates: Record<string, any> = {};
@@ -73,6 +76,8 @@ export class UsersController {
         emailNotifications: updatedUser.emailNotifications,
         smsNotifications: updatedUser.smsNotifications,
         twoFactorEnabled: updatedUser.twoFactorEnabled,
+        authProvider: updatedUser.authProvider,
+        profileCompleted: updatedUser.profileCompleted,
       });
     } catch (err) {
       next(err);

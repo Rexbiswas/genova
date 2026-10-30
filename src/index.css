@@ -50,6 +50,7 @@
     background-color: theme('colors.background');
     color: theme('colors.ink.DEFAULT');
     min-height: 100vh;
+    min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -123,4 +124,11 @@ html.lenis, html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Hide mobile bottom navigation when virtual keyboard opens */
+@media (max-height: 480px) and (orientation: landscape), (max-height: 460px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
 }

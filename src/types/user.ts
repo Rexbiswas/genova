@@ -13,6 +13,8 @@ export interface UserProfile {
   emailNotifications: boolean;
   smsNotifications: boolean;
   twoFactorEnabled: boolean;
+  authProvider?: 'local' | 'google';
+  profileCompleted?: boolean;
 }
 
 export interface SupportTicket {

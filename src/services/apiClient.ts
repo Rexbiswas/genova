@@ -1,13 +1,17 @@
+const isLocalhost =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  (typeof window !== 'undefined' && window.location.hostname
-    ? `http://${window.location.hostname}:5000/api`
-    : 'http://localhost:5000/api');
+  (isLocalhost ? 'http://localhost:5000/api' : '/api');
 
 export function getAppMode(): 'demo' | 'live' {
   const stored = localStorage.getItem('genova_app_mode');
   if (stored === 'live' || stored === 'demo') return stored;
-  return import.meta.env.VITE_APP_MODE === 'live' ? 'live' : 'live'; // Default to live backend
+  // If running in production with no custom backend url, default to demo mode for guaranteed uptime
+  if (!isLocalhost && !import.meta.env.VITE_API_BASE_URL) return 'demo';
+  return import.meta.env.VITE_APP_MODE === 'live' ? 'live' : 'live';
 }
 
 export function setAppMode(mode: 'demo' | 'live'): void {
@@ -48,12 +52,18 @@ export async function apiFetch<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  // 4.5 second timeout to prevent infinite loading on slow/blocked mobile connections
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 4500);
+
   try {
     const res = await fetch(url, {
       ...options,
+      signal: options.signal || controller.signal,
       headers,
       credentials: 'include', // Send and receive HttpOnly cookies
     });
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       const errorBody = await res.json().catch(() => ({ message: res.statusText }));
@@ -62,6 +72,7 @@ export async function apiFetch<T>(
 
     return (await res.json()) as T;
   } catch (error) {
+    clearTimeout(timeoutId);
     if (error instanceof ApiError) throw error;
     throw new ApiError(500, error instanceof Error ? error.message : 'Backend service is unavailable');
   }

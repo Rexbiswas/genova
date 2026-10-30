@@ -18,6 +18,7 @@ import {
   LogOut,
   X,
   Mic,
+  HeartPulse,
 } from 'lucide-react';
 import { LocationPin } from '../ui/LocationPin';
 import { useApp } from '../../contexts/AppContext';
@@ -205,16 +206,16 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md px-4 lg:px-8 py-4 flex items-center justify-between gap-4 border-b border-border/60 transition-all">
+    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4 flex items-center justify-between gap-3 sm:gap-4 border-b border-border/60 transition-all">
       {/* Left: Mobile Brand & Greeting */}
       <div className="flex items-center gap-2.5 sm:gap-3">
         {/* Mobile Brand Title (Screen 1) */}
-        <div className="flex items-center gap-2 md:hidden">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan flex items-center justify-center text-white shadow-xs">
-            <span className="text-base font-black">✚</span>
+        <div className="flex items-center gap-2.5 md:hidden">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00ADEF] via-[#0098DA] to-[#0082C5] flex items-center justify-center text-white shadow-xs p-1.5 shrink-0">
+            <HeartPulse className="w-full h-full stroke-[2.6]" />
           </div>
           <div>
-            <span className="text-sm font-black text-ink tracking-tight block leading-tight">Genova</span>
+            <span className="text-base font-black text-ink tracking-tight block leading-tight">Genova</span>
             <span className="text-[8px] font-black text-primary tracking-widest uppercase block leading-none">HEALTHCARE OS</span>
           </div>
         </div>
@@ -463,6 +464,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchSubmit }) => {
                       await logout();
                       showToast('Signed out successfully', 'info');
                       setUserMenuOpen(false);
+                      navigate('/', { replace: true });
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-error hover:bg-red-50 transition-colors cursor-pointer text-left"
                   >

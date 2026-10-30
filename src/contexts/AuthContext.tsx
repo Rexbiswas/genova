@@ -11,6 +11,9 @@ interface AuthContextType {
   setMode: (mode: 'live' | 'demo') => void;
   login: (email: string, password?: string) => Promise<void>;
   register: (name: string, email: string, password?: string) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<{ isNewUser?: boolean; user: UserProfile }>;
+  updateProfile: (data: Partial<UserProfile>) => Promise<UserProfile>;
+  skipToDemo: () => void;
   logout: () => Promise<void>;
   authModalOpen: boolean;
   openAuthModal: () => void;
@@ -20,9 +23,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mode, setModeState] = useState<'live' | 'demo'>(getAppMode());
+  const [mode, setModeState] = useState<'live' | 'demo'>(() => {
+    return (localStorage.getItem('genova_app_mode') as 'live' | 'demo') || 'live';
+  });
   const [user, setUser] = useState<UserProfile | null>(() => {
-    return getAppMode() === 'demo' ? initialUserProfile : null;
+    const savedToken = localStorage.getItem('genova_token');
+    const demoActive = localStorage.getItem('genova_demo_active') === 'true';
+    if (demoActive && !savedToken) {
+      return initialUserProfile;
+    }
+    return null;
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -30,8 +40,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Restore session from backend on mount
   useEffect(() => {
     async function restoreSession() {
-      if (mode === 'demo') {
+      const demoActive = localStorage.getItem('genova_demo_active') === 'true';
+      const token = localStorage.getItem('genova_token');
+
+      if (demoActive && !token) {
         setUser(initialUserProfile);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!token) {
+        setUser(null);
         setIsLoading(false);
         return;
       }
@@ -42,12 +61,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(res.user);
         }
       } catch (err) {
-        console.info('[Auth] No active backend session found, using guest mode');
-        // If no active session and token missing, leave user as null
-        const token = localStorage.getItem('genova_token');
-        if (!token) {
-          setUser(null);
-        }
+        console.info('[Auth] No active backend session found for stored token');
+        localStorage.removeItem('genova_token');
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -60,15 +76,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     saveAppMode(newMode);
     setModeState(newMode);
     if (newMode === 'demo') {
+      localStorage.setItem('genova_demo_active', 'true');
       setUser(initialUserProfile);
     } else {
-      setUser(null);
+      localStorage.removeItem('genova_demo_active');
+      const token = localStorage.getItem('genova_token');
+      if (!token) setUser(null);
     }
+  };
+
+  const skipToDemo = () => {
+    localStorage.setItem('genova_demo_active', 'true');
+    saveAppMode('demo');
+    setModeState('demo');
+    setUser(initialUserProfile);
   };
 
   const login = async (email: string, password?: string) => {
     if (mode === 'demo') {
-      setUser({ ...initialUserProfile, email });
+      const demoUser = { ...initialUserProfile, email, profileCompleted: true };
+      localStorage.setItem('genova_demo_active', 'true');
+      setUser(demoUser);
       return;
     }
 
@@ -79,6 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (res.token) {
       localStorage.setItem('genova_token', res.token);
+      localStorage.removeItem('genova_demo_active');
     }
     setUser(res.user);
     setAuthModalOpen(false);
@@ -86,7 +115,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password?: string) => {
     if (mode === 'demo') {
-      setUser({ ...initialUserProfile, name, email });
+      const demoUser = { ...initialUserProfile, name, email, profileCompleted: false };
+      localStorage.setItem('genova_demo_active', 'true');
+      setUser(demoUser);
       return;
     }
 
@@ -97,20 +128,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (res.token) {
       localStorage.setItem('genova_token', res.token);
+      localStorage.removeItem('genova_demo_active');
     }
     setUser(res.user);
     setAuthModalOpen(false);
   };
 
+  const loginWithGoogle = async (credential: string): Promise<{ isNewUser?: boolean; user: UserProfile }> => {
+    if (mode === 'demo') {
+      const googleDemoUser: UserProfile = {
+        ...initialUserProfile,
+        id: `usr-g-${Date.now()}`,
+        name: 'Alex Rivera',
+        email: 'alex.rivera@gmail.com',
+        authProvider: 'google',
+        profileCompleted: false, // Prompt profile completion for fresh experience
+      };
+      localStorage.setItem('genova_demo_active', 'true');
+      setUser(googleDemoUser);
+      return { isNewUser: true, user: googleDemoUser };
+    }
+
+    const res = await apiFetch<{
+      success: boolean;
+      token: string;
+      isNewUser: boolean;
+      user: UserProfile;
+    }>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ credential }),
+    });
+
+    if (res.token) {
+      localStorage.setItem('genova_token', res.token);
+      localStorage.removeItem('genova_demo_active');
+    }
+    setUser(res.user);
+    return { isNewUser: res.isNewUser, user: res.user };
+  };
+
+  const updateProfile = async (data: Partial<UserProfile>): Promise<UserProfile> => {
+    if (mode === 'demo' || !localStorage.getItem('genova_token')) {
+      const updated: UserProfile = {
+        ...(user || initialUserProfile),
+        ...data,
+        profileCompleted: true,
+      };
+      setUser(updated);
+      return updated;
+    }
+
+    const res = await apiFetch<UserProfile>('/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+
+    setUser(res);
+    return res;
+  };
+
   const logout = async () => {
-    if (mode === 'live') {
+    if (mode === 'live' && localStorage.getItem('genova_token')) {
       try {
         await apiFetch('/auth/logout', { method: 'POST' });
       } catch {
         // Continue clearing local state
       }
-      localStorage.removeItem('genova_token');
     }
+    localStorage.removeItem('genova_token');
+    localStorage.removeItem('genova_demo_active');
     setUser(null);
   };
 
@@ -127,6 +213,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMode,
         login,
         register,
+        loginWithGoogle,
+        updateProfile,
+        skipToDemo,
         logout,
         authModalOpen,
         openAuthModal,

@@ -15,6 +15,7 @@ import {
   Bot,
   FolderHeart,
   Pill,
+  HeartPulse,
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { gsap } from '../../animations/gsap';
@@ -92,8 +93,8 @@ export const MobileSidebar: React.FC = () => {
         {/* Brand & Close (Screen 10) */}
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan flex items-center justify-center text-white shadow-xs font-black">
-              ✚
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00ADEF] via-[#0098DA] to-[#0082C5] flex items-center justify-center text-white shadow-xs p-1.5 shrink-0">
+              <HeartPulse className="w-full h-full stroke-[2.6]" />
             </div>
             <div>
               <span className="text-base font-black text-ink tracking-tight block leading-tight">Genova</span>

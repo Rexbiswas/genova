@@ -3,6 +3,14 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { Skeleton } from '../components/ui/Skeleton';
 
+import { useAuth } from '../contexts/AuthContext';
+
+// Lazy-loaded auth and onboarding routes
+const OnboardingPage = lazy(() => import('../pages/OnboardingPage'));
+const LoginPage = lazy(() => import('../pages/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/RegisterPage'));
+const CompleteProfilePage = lazy(() => import('../pages/CompleteProfilePage'));
+
 // Lazy-loaded route components for optimal bundle splitting
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
 const CalendarPage = lazy(() => import('../pages/CalendarPage'));
@@ -20,30 +28,101 @@ const MedicationsPage = lazy(() => import('../pages/MedicationsPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const UnauthorizedPage = lazy(() => import('../pages/UnauthorizedPage'));
 
+const ProtectedAppLayout: React.FC = () => {
+  const { isAuthenticated, isLoading, mode } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-[#F5FAFF]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-[#0798D0] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-semibold text-[#718198]">Connecting to Genova...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Allow authenticated users or active demo session
+  if (!isAuthenticated && mode !== 'demo') {
+    return <Navigate to="/" replace />;
+  }
+
+  return <AppLayout />;
+};
+
 const PageFallback: React.FC = () => (
-  <div className="space-y-6 py-4">
-    <div className="space-y-2">
-      <Skeleton className="h-8 w-64" />
-      <Skeleton className="h-4 w-96" />
+  <div className="space-y-3.5 sm:space-y-5 py-1 sm:py-3 max-w-full overflow-hidden animate-in fade-in duration-150">
+    {/* Greeting / Page title skeleton */}
+    <div className="space-y-1.5">
+      <Skeleton className="h-6 w-36 sm:w-48 rounded-lg" />
+      <Skeleton className="h-3.5 w-48 sm:w-64 max-w-full rounded-md" />
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Skeleton className="h-48 rounded-card" />
-      <Skeleton className="h-48 rounded-card" />
-      <Skeleton className="h-48 rounded-card" />
+
+    {/* Mobile search bar skeleton */}
+    <Skeleton className="h-10 w-full rounded-xl md:hidden" />
+
+    {/* Hero banner skeleton */}
+    <Skeleton className="h-28 sm:h-36 lg:h-44 w-full rounded-2xl" />
+
+    {/* Mobile shortcuts skeleton */}
+    <div className="grid grid-cols-4 gap-2.5 md:hidden">
+      <Skeleton className="h-20 rounded-2xl" />
+      <Skeleton className="h-20 rounded-2xl" />
+      <Skeleton className="h-20 rounded-2xl" />
+      <Skeleton className="h-20 rounded-2xl" />
     </div>
-    <Skeleton className="h-72 rounded-card" />
+
+    {/* Doctor cards section skeleton */}
+    <div className="space-y-2.5">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-5 w-32 rounded-md" />
+        <Skeleton className="h-3.5 w-20 rounded-md" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
+        <Skeleton className="h-32 rounded-2xl" />
+        <Skeleton className="h-32 rounded-2xl hidden sm:block" />
+        <Skeleton className="h-32 rounded-2xl hidden lg:block" />
+      </div>
+    </div>
   </div>
 );
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <Suspense fallback={<PageFallback />}>
+        <OnboardingPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/login',
+    element: (
+      <Suspense fallback={<PageFallback />}>
+        <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/register',
+    element: (
+      <Suspense fallback={<PageFallback />}>
+        <RegisterPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/complete-profile',
+    element: (
+      <Suspense fallback={<PageFallback />}>
+        <CompleteProfilePage />
+      </Suspense>
+    ),
+  },
+  {
+    element: <ProtectedAppLayout />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />,
-      },
       {
         path: 'dashboard',
         element: (

@@ -18,6 +18,7 @@ import {
   Users,
   Bell,
   Crown,
+  HeartPulse,
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 
@@ -112,8 +113,8 @@ export const Sidebar: React.FC = () => {
 
         {/* Brand Header */}
         <div className={`p-5 border-b border-slate-100 flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan flex items-center justify-center text-white shadow-md shadow-primary/20 shrink-0">
-            <span className="text-xl font-black">✚</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00ADEF] via-[#0098DA] to-[#0082C5] flex items-center justify-center text-white shadow-md shadow-sky-500/25 p-1.5 shrink-0">
+            <HeartPulse className="w-full h-full stroke-[2.6]" />
           </div>
           {!sidebarCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">

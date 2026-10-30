@@ -60,9 +60,9 @@ export const DoctorDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="pb-24 md:pb-12">
+    <div className="pb-20 md:pb-12">
       {/* MOBILE SCREEN 3 IMPLEMENTATION */}
-      <div className="md:hidden -mx-4 -mt-4 bg-white min-h-screen">
+      <div className="md:hidden -mx-3 -mt-2.5 sm:-mx-4 sm:-mt-4 bg-white min-h-[100dvh]">
         {/* Top Image Hero Banner with Floating Controls */}
         <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-100">
           <img

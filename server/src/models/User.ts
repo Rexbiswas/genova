@@ -20,6 +20,9 @@ export interface IUser extends Document {
   smsNotifications: boolean;
   twoFactorEnabled: boolean;
   isVerified: boolean;
+  googleId?: string;
+  authProvider: 'local' | 'google';
+  profileCompleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,6 +48,9 @@ const UserSchema = new Schema<IUser>(
     smsNotifications: { type: Boolean, default: true },
     twoFactorEnabled: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: true },
+    googleId: { type: String, sparse: true, index: true },
+    authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
+    profileCompleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -11,7 +11,7 @@ export const DashboardPage: React.FC = () => {
   const { profile, openSearchOverlay } = useApp();
 
   return (
-    <div className="space-y-5 sm:space-y-7 pb-10">
+    <div className="space-y-3.5 sm:space-y-6">
       {/* Mobile Greeting (Screen 1) */}
       <div className="md:hidden space-y-1">
         <span className="text-xs font-semibold text-ink-muted">Good Morning,</span>

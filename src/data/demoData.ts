@@ -212,6 +212,8 @@ export const initialUserProfile: UserProfile = {
   emailNotifications: true,
   smsNotifications: true,
   twoFactorEnabled: false,
+  authProvider: 'local',
+  profileCompleted: true,
 };
 
 export const initialNotifications: NotificationItem[] = [

@@ -6,7 +6,7 @@ import { seedDatabase } from '../src/jobs/seedData.js';
 import { User } from '../src/models/User.js';
 import { MedicalRecord } from '../src/models/MedicalRecord.js';
 
-describe('Genova Healthcare OS Full-Stack API Test Suite', () => {
+describe('Genova Healthcare OS API Test Suite', () => {
   let patientToken: string;
   let patientUser: any;
   let anotherPatientToken: string;
@@ -219,6 +219,96 @@ describe('Genova Healthcare OS Full-Stack API Test Suite', () => {
       expect(toolAction).toBeDefined();
       expect(toolAction.requiresConfirmation).toBe(true);
       expect(toolAction.status).toBe('pending_confirmation');
+    });
+  });
+
+  describe('7. Google Sign-In, Profile Completion & Account Linking', () => {
+    let googleUserToken: string;
+
+    it('rejects Google authentication when credential is missing', async () => {
+      const res = await request(app).post('/api/auth/google').send({});
+      expect(res.status).toBe(400);
+    });
+
+    it('authenticates and creates new user profile via Google OAuth token', async () => {
+      const mockGoogleSub = `google-test-${Date.now()}`;
+      const mockPayload = Buffer.from(
+        JSON.stringify({
+          sub: mockGoogleSub,
+          name: 'Maria Santos',
+          email: 'maria.santos.test@gmail.com',
+          email_verified: true,
+          picture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&q=80',
+        })
+      ).toString('base64');
+      const testToken = `mock-google-token.header.${mockPayload}.signature`;
+
+      const res = await request(app)
+        .post('/api/auth/google')
+        .send({ credential: testToken });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.token).toBeDefined();
+      expect(res.body.isNewUser).toBe(true);
+      expect(res.body.user.email).toBe('maria.santos.test@gmail.com');
+      expect(res.body.user.name).toBe('Maria Santos');
+      expect(res.body.user.authProvider).toBe('google');
+      expect(res.body.user.profileCompleted).toBe(false);
+
+      googleUserToken = res.body.token;
+    });
+
+    it('logs in existing Google user without creating duplicate account', async () => {
+      const mockGoogleSub = `google-test-existing`;
+      const mockPayload = Buffer.from(
+        JSON.stringify({
+          sub: mockGoogleSub,
+          name: 'Maria Santos',
+          email: 'maria.santos.test@gmail.com',
+          email_verified: true,
+        })
+      ).toString('base64');
+      const testToken = `mock-google-token.header.${mockPayload}.signature`;
+
+      const res = await request(app)
+        .post('/api/auth/google')
+        .send({ credential: testToken });
+
+      expect(res.status).toBe(200);
+      expect(res.body.isNewUser).toBe(false);
+      expect(res.body.user.email).toBe('maria.santos.test@gmail.com');
+    });
+
+    it('allows newly authenticated user to complete their healthcare profile', async () => {
+      const res = await request(app)
+        .patch('/api/users/me')
+        .set('Authorization', `Bearer ${googleUserToken}`)
+        .send({
+          phone: '(+351) 933 112 233',
+          dob: '1992-06-15',
+          bloodGroup: 'A+',
+          emergencyContact: '(+351) 911 223 344',
+          preferredLanguage: 'pt',
+          profileCompleted: true,
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.phone).toBe('(+351) 933 112 233');
+      expect(res.body.dob).toBe('1992-06-15');
+      expect(res.body.bloodGroup).toBe('A+');
+      expect(res.body.profileCompleted).toBe(true);
+      expect(res.body.preferredLanguage).toBe('pt');
+    });
+
+    it('verifies updated profile fields are persistent across sessions', async () => {
+      const res = await request(app)
+        .get('/api/users/me')
+        .set('Authorization', `Bearer ${googleUserToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.phone).toBe('(+351) 933 112 233');
+      expect(res.body.profileCompleted).toBe(true);
     });
   });
 });
