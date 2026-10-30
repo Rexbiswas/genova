@@ -68,6 +68,63 @@ describe('Genova Healthcare OS API Test Suite', () => {
       expect(res.body.email).toBe('stevan@genova.health');
     });
 
+    it('rejects registration with invalid email format', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ name: 'Test User', email: 'not-an-email', password: 'Password123!' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('rejects registration with password shorter than 6 characters', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ name: 'Test User', email: 'test.short@genova.health', password: '123' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('rejects duplicate registration with 409 Conflict', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({
+          name: 'Stevan Duplicate',
+          email: 'stevan@genova.health',
+          password: 'Password123!',
+        });
+
+      expect(res.status).toBe(409);
+      expect(res.body.message).toContain('already exists');
+    });
+
+    it('successfully registers a new unique user and returns safe profile without password', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({
+          name: 'Fresh Patient',
+          email: 'fresh.patient@genova.health',
+          password: 'StrongPassword2026!',
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.token).toBeDefined();
+      expect(res.body.user).toBeDefined();
+      expect(res.body.user.email).toBe('fresh.patient@genova.health');
+      expect(res.body.user.password).toBeUndefined();
+      expect(res.body.user.role).toBe('patient');
+    });
+
+    it('rejects login with nonexistent account', async () => {
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'nonexistent@genova.health', password: 'AnyPassword' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.message).toContain('Invalid email or password');
+    });
+
     it('rejects login with invalid password', async () => {
       const res = await request(app)
         .post('/api/auth/login')
@@ -75,6 +132,64 @@ describe('Genova Healthcare OS API Test Suite', () => {
 
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
+    });
+
+    it('successfully logs in with valid credentials and sets session', async () => {
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'stevan@genova.health', password: 'GenovaPatient2026!' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.token).toBeDefined();
+      expect(res.body.user.email).toBe('stevan@genova.health');
+      expect(res.headers['set-cookie']).toBeDefined();
+    });
+
+    it('logs out and clears session cookie', async () => {
+      const res = await request(app).post('/api/auth/logout');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+
+    it('updates user profile and persists changes in database', async () => {
+      const res = await request(app)
+        .patch('/api/users/me')
+        .set('Authorization', `Bearer ${anotherPatientToken}`)
+        .send({
+          phone: '(+351) 912-345-678',
+          bloodGroup: 'B+',
+          dob: '1995-04-12',
+          profileCompleted: true,
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.phone).toBe('(+351) 912-345-678');
+      expect(res.body.bloodGroup).toBe('B+');
+      expect(res.body.profileCompleted).toBe(true);
+
+      // Verify retrieval returns persisted updates
+      const meRes = await request(app)
+        .get('/api/users/me')
+        .set('Authorization', `Bearer ${anotherPatientToken}`);
+
+      expect(meRes.status).toBe(200);
+      expect(meRes.body.phone).toBe('(+351) 912-345-678');
+      expect(meRes.body.bloodGroup).toBe('B+');
+    });
+
+    it('prevents privilege escalation via ordinary profile update', async () => {
+      const res = await request(app)
+        .patch('/api/users/me')
+        .set('Authorization', `Bearer ${anotherPatientToken}`)
+        .send({
+          role: 'admin',
+          email: 'hacked@genova.health',
+        });
+
+      expect(res.status).toBe(200);
+      // Role and email must remain unchanged
+      expect(res.body.role).toBe('patient');
+      expect(res.body.email).toBe('second.patient@genova.health');
     });
   });
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { HeartPulse } from 'lucide-react';
 
 interface GenovaLogoProps {
   className?: string;
@@ -13,39 +12,51 @@ export const GenovaLogo: React.FC<GenovaLogoProps> = ({
   size = 'md',
 }) => {
   const iconSizes = {
-    sm: 'w-7 h-7 rounded-[10px] p-1.5',
-    md: 'w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl p-1.5 sm:p-2',
-    lg: 'w-12 h-12 sm:w-14 sm:h-14 rounded-2xl p-2.5',
+    sm: 'w-8 h-8 rounded-lg',
+    md: 'w-10 h-10 rounded-xl',
+    lg: 'w-12 h-12 rounded-2xl',
   };
 
   const textSizes = {
-    sm: 'text-base font-extrabold',
-    md: 'text-xl sm:text-2xl font-black',
-    lg: 'text-2xl sm:text-3xl font-black',
+    sm: 'text-lg font-bold',
+    md: 'text-[22px] font-bold',
+    lg: 'text-2xl font-bold',
   };
 
   const taglineSizes = {
-    sm: 'text-[9px]',
-    md: 'text-[10px] sm:text-[11px]',
+    sm: 'text-[9.5px]',
+    md: 'text-[10.5px]',
     lg: 'text-xs',
   };
 
   return (
-    <div className={`flex items-center gap-2.5 select-none ${className}`}>
-      {/* Brand Healthcare Heart-ECG Squircle */}
+    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
+      {/* Brand Healthcare Heart-Pulse Cross Squircle matching Genova reference */}
       <div
-        className={`${iconSizes[size]} relative flex items-center justify-center shrink-0 bg-gradient-to-br from-[#00ADEF] via-[#0098DA] to-[#0082C5] shadow-md shadow-sky-500/25 transition-transform hover:scale-105`}
+        className={`${iconSizes[size]} shrink-0 bg-[#009ee2] shadow-sm flex items-center justify-center text-white`}
         aria-hidden="true"
       >
-        <HeartPulse className="w-full h-full text-white stroke-[2.6]" />
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="w-5 h-5 text-white"
+          stroke="currentColor"
+          strokeWidth="2.3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {/* Medical cross outline with cardiogram heartbeat pulse through center */}
+          <path d="M12 3.5v4.5m0 8v4.5" />
+          <path d="M3.5 12h3.5l1.5-2.5 2.5 5 2.5-4 1.5 1.5h5.5" />
+        </svg>
       </div>
 
-      <div className="flex flex-col">
-        <span className={`tracking-tight text-[#14233B] leading-none ${textSizes[size]}`}>
+      <div className="flex flex-col text-left">
+        <span className={`tracking-tight text-slate-900 leading-none ${textSizes[size]}`}>
           Genova
         </span>
         {showTagline && (
-          <span className={`text-[#718198] font-medium tracking-tight mt-0.5 leading-tight ${taglineSizes[size]}`}>
+          <span className={`text-slate-400 font-medium tracking-tight mt-1 leading-none ${taglineSizes[size]}`}>
             Better Care. Smarter Connections.
           </span>
         )}

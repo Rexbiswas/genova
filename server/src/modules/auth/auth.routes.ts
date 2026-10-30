@@ -9,10 +9,9 @@ const router = Router();
 
 const registerSchema = {
   body: z.object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please provide a valid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters').optional(),
-    role: z.enum(['patient', 'doctor', 'clinic_staff', 'admin']).optional(),
+    name: z.string().min(2, 'Name must be at least 2 characters').max(100),
+    email: z.string().email('Please provide a valid email address').toLowerCase().trim(),
+    password: z.string().min(6, 'Password must be at least 6 characters long'),
     phone: z.string().optional(),
     location: z.string().optional(),
   }),
@@ -20,8 +19,8 @@ const registerSchema = {
 
 const loginSchema = {
   body: z.object({
-    email: z.string().email('Please provide a valid email'),
-    password: z.string().optional(),
+    email: z.string().email('Please provide a valid email address').toLowerCase().trim(),
+    password: z.string().min(1, 'Password is required'),
   }),
 };
 

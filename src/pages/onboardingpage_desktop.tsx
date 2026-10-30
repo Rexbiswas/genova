@@ -19,15 +19,9 @@ import { triggerGoogleSignIn } from '../services/googleAuth';
 
 export const OnboardingPageDesktop: React.FC = () => {
   const navigate = useNavigate();
-  const { loginWithGoogle, skipToDemo } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const { showToast } = useApp();
   const [googleLoading, setGoogleLoading] = useState(false);
-
-  const handleSkip = () => {
-    skipToDemo();
-    showToast('Entered Genova demo experience', 'info');
-    navigate('/dashboard');
-  };
 
   const handleGetStarted = () => {
     navigate('/register');
@@ -83,11 +77,11 @@ export const OnboardingPageDesktop: React.FC = () => {
         <GenovaLogo size="md" />
         <button
           type="button"
-          onClick={handleSkip}
-          className="flex items-center gap-1.5 text-xs lg:text-sm font-semibold text-[#718198] hover:text-[#0798D0] transition-colors cursor-pointer group"
-          aria-label="Skip onboarding"
+          onClick={handleLogin}
+          className="flex items-center gap-1.5 text-xs lg:text-sm font-semibold text-[#0798D0] hover:text-[#0284C7] transition-colors cursor-pointer group"
+          aria-label="Sign in"
         >
-          <span>Skip</span>
+          <span>Sign In</span>
           <ArrowRight className="w-3.5 h-3.5 lg:w-4 lg:h-4 transition-transform group-hover:translate-x-0.5" />
         </button>
       </header>

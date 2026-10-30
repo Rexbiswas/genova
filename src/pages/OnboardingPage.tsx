@@ -22,7 +22,7 @@ import { OnboardingPageDesktop } from './onboardingpage_desktop';
 
 export const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading, loginWithGoogle, skipToDemo } = useAuth();
+  const { user, isAuthenticated, isLoading, loginWithGoogle } = useAuth();
   const { showToast } = useApp();
 
   const [activeSlide, setActiveSlide] = useState(0);
@@ -63,12 +63,6 @@ export const OnboardingPage: React.FC = () => {
       }
     }
   }, [isAuthenticated, isLoading, user, navigate]);
-
-  const handleSkip = () => {
-    skipToDemo();
-    showToast('Entered Genova demo experience', 'info');
-    navigate('/dashboard');
-  };
 
   const handleGetStarted = () => {
     navigate('/register');
@@ -145,11 +139,11 @@ export const OnboardingPage: React.FC = () => {
           <GenovaLogo size="sm" />
           <button
             type="button"
-            onClick={handleSkip}
-            className="text-xs font-semibold text-[#718198] hover:text-[#0798D0] transition-colors px-2 py-0.5 rounded-lg hover:bg-sky-50 active:scale-95"
-            aria-label="Skip onboarding and enter demo"
+            onClick={handleLogin}
+            className="text-xs font-semibold text-[#0798D0] hover:text-[#0284C7] transition-colors px-2 py-0.5 rounded-lg hover:bg-sky-50 active:scale-95"
+            aria-label="Sign in"
           >
-            Skip
+            Sign In
           </button>
         </header>
 

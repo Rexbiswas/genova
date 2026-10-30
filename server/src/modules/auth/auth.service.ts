@@ -33,31 +33,30 @@ export class AuthService {
   }
 
   static async register(input: RegisterInput, ip?: string, userAgent?: string): Promise<{ user: IUser; token: string }> {
-    const existing = await User.findOne({ email: input.email.toLowerCase() });
+    const normalizedEmail = input.email.toLowerCase().trim();
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       throw { statusCode: 409, message: 'An account with this email address already exists.' };
     }
 
-    let hashedPassword = undefined;
-    if (input.password) {
-      hashedPassword = await bcrypt.hash(input.password, 10);
-    } else {
-      // Default dev fallback password
-      hashedPassword = await bcrypt.hash('GenovaPatient2026!', 10);
+    if (!input.password || input.password.length < 6) {
+      throw { statusCode: 400, message: 'Password must be at least 6 characters long.' };
     }
 
+    const hashedPassword = await bcrypt.hash(input.password, 12);
+
     const newUser = await User.create({
-      name: input.name,
-      email: input.email.toLowerCase(),
+      name: input.name.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
-      role: input.role || 'patient',
+      role: 'patient', // New self-registered users are strictly patients
       phone: input.phone || '',
       location: input.location || 'Braga, Portugal',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&q=80',
       tier: 'Standard',
       preferredLanguage: 'en',
       authProvider: 'local',
-      profileCompleted: !!(input.phone && input.location),
+      profileCompleted: false, // Local registration requires completing profile
     });
 
     const token = this.generateToken(newUser);
@@ -77,12 +76,13 @@ export class AuthService {
   }
 
   static async login(input: LoginInput, ip?: string, userAgent?: string): Promise<{ user: IUser; token: string }> {
-    const user = await User.findOne({ email: input.email.toLowerCase() }).select('+password');
+    const normalizedEmail = input.email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
     if (!user) {
       await AuditEvent.create({
         action: 'user_login',
         resourceType: 'User',
-        details: { attemptedEmail: input.email },
+        details: { attemptedEmail: normalizedEmail },
         ipAddress: ip,
         userAgent,
         status: 'failure',
@@ -90,21 +90,30 @@ export class AuthService {
       throw { statusCode: 401, message: 'Invalid email or password.' };
     }
 
-    if (input.password && user.password) {
-      const match = await bcrypt.compare(input.password, user.password);
-      if (!match) {
-        await AuditEvent.create({
-          userId: user._id,
-          actorRole: user.role,
-          action: 'user_login',
-          resourceType: 'User',
-          resourceId: user._id.toString(),
-          ipAddress: ip,
-          userAgent,
-          status: 'failure',
-        });
-        throw { statusCode: 401, message: 'Invalid email or password.' };
-      }
+    if (!user.password) {
+      throw {
+        statusCode: 400,
+        message: 'This account was registered with Google. Please use Continue with Google.',
+      };
+    }
+
+    if (!input.password) {
+      throw { statusCode: 400, message: 'Password is required.' };
+    }
+
+    const match = await bcrypt.compare(input.password, user.password);
+    if (!match) {
+      await AuditEvent.create({
+        userId: user._id,
+        actorRole: user.role,
+        action: 'user_login',
+        resourceType: 'User',
+        resourceId: user._id.toString(),
+        ipAddress: ip,
+        userAgent,
+        status: 'failure',
+      });
+      throw { statusCode: 401, message: 'Invalid email or password.' };
     }
 
     const token = this.generateToken(user);

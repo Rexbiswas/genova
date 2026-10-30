@@ -7,7 +7,7 @@ import { Activity, ShieldCheck, Mail, Lock, User } from 'lucide-react';
 import { triggerGoogleSignIn } from '../../services/googleAuth';
 
 export const AuthModal: React.FC = () => {
-  const { authModalOpen, closeAuthModal, login, register, loginWithGoogle, mode, setMode } = useAuth();
+  const { authModalOpen, closeAuthModal, login, register, loginWithGoogle } = useAuth();
   const { showToast } = useApp();
 
   const [isRegister, setIsRegister] = useState(false);
@@ -34,12 +34,6 @@ export const AuthModal: React.FC = () => {
     }
   };
 
-  const handleQuickDemo = () => {
-    setMode('demo');
-    closeAuthModal();
-    showToast('Switched to Genova Demo Mode', 'info');
-  };
-
   return (
     <Modal isOpen={authModalOpen} onClose={closeAuthModal} title={isRegister ? 'Create Genova Account' : 'Sign in to Genova'}>
       <div className="space-y-4 py-1">
@@ -58,20 +52,6 @@ export const AuthModal: React.FC = () => {
           </p>
         </div>
 
-        {/* Mode Switcher Banner */}
-        <div className="p-3 bg-slate-50 border border-border-light rounded-xl flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="font-semibold text-ink">Active Mode: <strong className="uppercase">{mode}</strong></span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setMode(mode === 'live' ? 'demo' : 'live')}
-            className="text-[11px] text-primary hover:underline font-bold cursor-pointer"
-          >
-            Switch to {mode === 'live' ? 'Demo Mode' : 'Live Mode'}
-          </button>
-        </div>
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-3 text-xs">
@@ -173,16 +153,6 @@ export const AuthModal: React.FC = () => {
             {isRegister
               ? 'Already have an account? Sign In'
               : "Don't have an account? Create one"}
-          </button>
-        </div>
-
-        <div className="text-center pt-1 border-t border-border-light">
-          <button
-            type="button"
-            onClick={handleQuickDemo}
-            className="text-[11px] text-ink-muted hover:text-ink font-semibold"
-          >
-            Or continue in Guest Demo Mode
           </button>
         </div>
       </div>

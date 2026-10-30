@@ -25,7 +25,7 @@ declare global {
               locale?: string;
             }
           ) => void;
-          prompt: () => void;
+          prompt: (notification?: (notification: { isNotDisplayed: () => boolean; isSkippedMoment: () => boolean; getNotDisplayedReason: () => string; getSkippedReason: () => string }) => void) => void;
         };
       };
     };
@@ -59,46 +59,41 @@ export function loadGoogleScript(): Promise<boolean> {
 }
 
 /**
- * Triggers Google Sign-In: uses native GIS popup if VITE_GOOGLE_CLIENT_ID is configured,
- * or generates a test token for development/evaluation if credentials are not yet provisioned.
+ * Triggers Google Sign-In using native Google Identity Services popup
  */
 export async function triggerGoogleSignIn(
   onSuccess: (credential: string) => void,
   onError?: (err: Error) => void
 ): Promise<void> {
-  if (GOOGLE_CLIENT_ID) {
-    const loaded = await loadGoogleScript();
-    if (loaded && window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (response) => {
-          if (response.credential) {
-            onSuccess(response.credential);
-          } else {
-            onError?.(new Error('Google sign-in was cancelled or failed'));
-          }
-        },
-      });
-      window.google.accounts.id.prompt();
-      return;
-    }
+  if (!GOOGLE_CLIENT_ID) {
+    const errorMsg = 'Google Sign-In is not configured yet. Please set VITE_GOOGLE_CLIENT_ID in your .env file.';
+    console.warn(`[GoogleAuth] ${errorMsg}`);
+    onError?.(new Error(errorMsg));
+    return;
   }
 
-  // Fallback when VITE_GOOGLE_CLIENT_ID is not configured in environment
-  console.info(
-    '[GoogleAuth] VITE_GOOGLE_CLIENT_ID not configured in frontend .env. Using mock token for testing.'
-  );
-  // Construct a safe test token payload
-  const mockPayload = {
-    sub: `mock-google-${Date.now()}`,
-    name: 'Dr. Alex Rivera',
-    email: 'alex.rivera.health@gmail.com',
-    email_verified: true,
-    picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&q=80',
-    iss: 'accounts.google.com',
-    exp: Math.floor(Date.now() / 1000) + 3600,
-  };
-  const base64Payload = btoa(JSON.stringify(mockPayload));
-  const testToken = `mock-google-token.header.${base64Payload}.signature`;
-  onSuccess(testToken);
+  const loaded = await loadGoogleScript();
+  if (loaded && window.google?.accounts?.id) {
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: (response) => {
+        if (response.credential) {
+          onSuccess(response.credential);
+        } else {
+          onError?.(new Error('Google sign-in was cancelled or returned no credentials'));
+        }
+      },
+    });
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed()) {
+        console.info('[GoogleAuth] Prompt not displayed:', notification.getNotDisplayedReason());
+      }
+      if (notification.isSkippedMoment()) {
+        console.info('[GoogleAuth] Moment skipped:', notification.getSkippedReason());
+      }
+    });
+    return;
+  }
+
+  onError?.(new Error('Unable to initialize Google Identity Services SDK. Please check your internet connection.'));
 }

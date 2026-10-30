@@ -29,7 +29,7 @@ const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const UnauthorizedPage = lazy(() => import('../pages/UnauthorizedPage'));
 
 const ProtectedAppLayout: React.FC = () => {
-  const { isAuthenticated, isLoading, mode } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -42,12 +42,50 @@ const ProtectedAppLayout: React.FC = () => {
     );
   }
 
-  // Allow authenticated users or active demo session
-  if (!isAuthenticated && mode !== 'demo') {
-    return <Navigate to="/" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user && user.profileCompleted === false) {
+    return <Navigate to="/complete-profile" replace />;
   }
 
   return <AppLayout />;
+};
+
+const AuthRouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (isAuthenticated) {
+    if (user && user.profileCompleted === false) {
+      return <Navigate to="/complete-profile" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const CompleteProfileGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user && user.profileCompleted === true) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const PageFallback: React.FC = () => (
@@ -100,7 +138,9 @@ export const router = createBrowserRouter([
     path: '/login',
     element: (
       <Suspense fallback={<PageFallback />}>
-        <LoginPage />
+        <AuthRouteGuard>
+          <LoginPage />
+        </AuthRouteGuard>
       </Suspense>
     ),
   },
@@ -108,7 +148,9 @@ export const router = createBrowserRouter([
     path: '/register',
     element: (
       <Suspense fallback={<PageFallback />}>
-        <RegisterPage />
+        <AuthRouteGuard>
+          <RegisterPage />
+        </AuthRouteGuard>
       </Suspense>
     ),
   },
@@ -116,7 +158,9 @@ export const router = createBrowserRouter([
     path: '/complete-profile',
     element: (
       <Suspense fallback={<PageFallback />}>
-        <CompleteProfilePage />
+        <CompleteProfileGuard>
+          <CompleteProfilePage />
+        </CompleteProfileGuard>
       </Suspense>
     ),
   },

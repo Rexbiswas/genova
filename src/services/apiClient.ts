@@ -6,19 +6,11 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (isLocalhost ? 'http://localhost:5000/api' : '/api');
 
-export function getAppMode(): 'demo' | 'live' {
-  const stored = localStorage.getItem('genova_app_mode');
-  if (stored === 'live' || stored === 'demo') return stored;
-  // If running in production with no custom backend url, default to demo mode for guaranteed uptime
-  if (!isLocalhost && !import.meta.env.VITE_API_BASE_URL) return 'demo';
-  return import.meta.env.VITE_APP_MODE === 'live' ? 'live' : 'live';
+export function getAppMode(): 'live' | 'demo' {
+  return 'live';
 }
 
-export function setAppMode(mode: 'demo' | 'live'): void {
-  localStorage.setItem('genova_app_mode', mode);
-}
-
-export const IS_DEMO_MODE = getAppMode() === 'demo';
+export const IS_DEMO_MODE = false;
 
 export class ApiError extends Error {
   constructor(
@@ -46,15 +38,15 @@ export async function apiFetch<T>(
     headers['Content-Type'] = 'application/json';
   }
 
-  // Attach token if present
+  // Attach token if present in localStorage
   const token = localStorage.getItem('genova_token');
   if (token && !headers['Authorization']) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // 4.5 second timeout to prevent infinite loading on slow/blocked mobile connections
+  // 10 second timeout for reliable database requests
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 4500);
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   try {
     const res = await fetch(url, {
@@ -67,13 +59,20 @@ export async function apiFetch<T>(
 
     if (!res.ok) {
       const errorBody = await res.json().catch(() => ({ message: res.statusText }));
-      throw new ApiError(res.status, errorBody.message || 'Network request failed', errorBody);
+      throw new ApiError(
+        res.status,
+        errorBody.message || errorBody.error || `Request failed with status ${res.status}`,
+        errorBody
+      );
     }
 
     return (await res.json()) as T;
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof ApiError) throw error;
-    throw new ApiError(500, error instanceof Error ? error.message : 'Backend service is unavailable');
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError(504, 'Server took too long to respond. Please check your connection and try again.');
+    }
+    throw new ApiError(503, error instanceof Error ? error.message : 'Backend service is unavailable');
   }
 }
